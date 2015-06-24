@@ -626,8 +626,20 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <packages>
 <package name="USB-MICRO-MOLEX-105017-0001">
 <description>&lt;b&gt; Molex Micro USB 105017-0001&lt;/b&gt;</description>
-<wire x1="6.6" y1="-4.15" x2="-1.6" y2="-4.15" width="0" layer="49"/>
-<wire x1="-1.6" y1="-4.85" x2="6.6" y2="-4.85" width="0" layer="49"/>
+<wire x1="6.6" y1="-4.15" x2="-1.6" y2="-4.15" width="0" layer="51"/>
+<wire x1="-1.6" y1="-4.85" x2="6.6" y2="-4.85" width="0" layer="51"/>
+<wire x1="-0.7" y1="-2.35" x2="-1" y2="-2.05" width="0" layer="20" curve="90"/>
+<wire x1="-1" y1="-2.05" x2="-1.3" y2="-2.35" width="0" layer="20" curve="90"/>
+<wire x1="-1.3" y1="-2.35" x2="-1.3" y2="-3.05" width="0" layer="20"/>
+<wire x1="-1.3" y1="-3.05" x2="-1" y2="-3.35" width="0" layer="20" curve="90"/>
+<wire x1="-1" y1="-3.35" x2="-0.7" y2="-3.05" width="0" layer="20" curve="90"/>
+<wire x1="-0.7" y1="-3.05" x2="-0.7" y2="-2.35" width="0" layer="20"/>
+<wire x1="6.3" y1="-2.35" x2="6" y2="-2.05" width="0" layer="20" curve="90"/>
+<wire x1="6" y1="-2.05" x2="5.7" y2="-2.35" width="0" layer="20" curve="90"/>
+<wire x1="5.7" y1="-2.35" x2="5.7" y2="-3.05" width="0" layer="20"/>
+<wire x1="5.7" y1="-3.05" x2="6" y2="-3.35" width="0" layer="20" curve="90"/>
+<wire x1="6" y1="-3.35" x2="6.3" y2="-3.05" width="0" layer="20" curve="90"/>
+<wire x1="6.3" y1="-3.05" x2="6.3" y2="-2.35" width="0" layer="20"/>
 <pad name="P$1" x="0" y="0" drill="0.85" diameter="1.45"/>
 <pad name="P$2" x="5" y="0" drill="0.85" diameter="1.45"/>
 <smd name="3" x="2.5" y="0" dx="1.35" dy="0.4" layer="1" rot="R90"/>
@@ -637,40 +649,14 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <smd name="1" x="1.2" y="0" dx="1.35" dy="0.4" layer="1" rot="R90"/>
 <smd name="P$3" x="3.5" y="-2.7" dx="1.9" dy="1.5" layer="1" rot="R90"/>
 <smd name="P$4" x="1.5" y="-2.7" dx="1.9" dy="1.5" layer="1" rot="R90"/>
-<text x="1.55" y="-4.15" size="0.3" layer="49">PCB EDGE</text>
-<text x="-0.8" y="-4.85" size="0.3" layer="49">CONNECTOR FRONT INTERFACE</text>
-<polygon width="0" layer="1">
-<vertex x="0.2" y="-1.75"/>
-<vertex x="0.2" y="-3.65"/>
-<vertex x="-1.1" y="-3.65" curve="-90"/>
-<vertex x="-1.6" y="-3.15"/>
-<vertex x="-1.6" y="-2.25" curve="-90"/>
-<vertex x="-1.1" y="-1.75"/>
-</polygon>
-<polygon width="0" layer="45">
-<vertex x="-0.7" y="-2.35"/>
-<vertex x="-0.7" y="-3.05" curve="-90"/>
-<vertex x="-1" y="-3.35" curve="-90"/>
-<vertex x="-1.3" y="-3.05"/>
-<vertex x="-1.3" y="-2.35" curve="-90"/>
-<vertex x="-1" y="-2.05" curve="-90"/>
-</polygon>
-<polygon width="0" layer="1">
-<vertex x="4.8" y="-3.65"/>
-<vertex x="4.8" y="-1.75"/>
-<vertex x="6.1" y="-1.75" curve="-90"/>
-<vertex x="6.6" y="-2.25"/>
-<vertex x="6.6" y="-3.15" curve="-90"/>
-<vertex x="6.1" y="-3.65"/>
-</polygon>
-<polygon width="0" layer="45">
-<vertex x="5.7" y="-3.05"/>
-<vertex x="5.7" y="-2.35" curve="-90"/>
-<vertex x="6" y="-2.05" curve="-90"/>
-<vertex x="6.3" y="-2.35"/>
-<vertex x="6.3" y="-3.05" curve="-90"/>
-<vertex x="6" y="-3.35" curve="-90"/>
-</polygon>
+<text x="1.55" y="-4.15" size="0.3" layer="51">PCB EDGE</text>
+<text x="-0.8" y="-4.85" size="0.3" layer="51">CONNECTOR FRONT INTERFACE</text>
+<text x="-1.95" y="1.45" size="0.8128" layer="25">&gt;NAME</text>
+<text x="3.1" y="1.5" size="0.8128" layer="27">&gt;VALUE</text>
+<rectangle x1="-1.7" y1="-3.75" x2="0.3" y2="-1.65" layer="29"/>
+<rectangle x1="4.7" y1="-3.75" x2="6.7" y2="-1.65" layer="29"/>
+<smd name="P$5" x="-0.7" y="-2.7" dx="1.8" dy="1.9" layer="1"/>
+<smd name="P$6" x="5.7" y="-2.7" dx="1.8" dy="1.9" layer="1"/>
 </package>
 </packages>
 <symbols>
