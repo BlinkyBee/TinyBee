@@ -628,18 +628,6 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <description>&lt;b&gt; Molex Micro USB 105017-0001&lt;/b&gt;</description>
 <wire x1="6.6" y1="-4.15" x2="-1.6" y2="-4.15" width="0" layer="51"/>
 <wire x1="-1.6" y1="-4.85" x2="6.6" y2="-4.85" width="0" layer="51"/>
-<wire x1="-0.7" y1="-2.35" x2="-1" y2="-2.05" width="0" layer="20" curve="90"/>
-<wire x1="-1" y1="-2.05" x2="-1.3" y2="-2.35" width="0" layer="20" curve="90"/>
-<wire x1="-1.3" y1="-2.35" x2="-1.3" y2="-3.05" width="0" layer="20"/>
-<wire x1="-1.3" y1="-3.05" x2="-1" y2="-3.35" width="0" layer="20" curve="90"/>
-<wire x1="-1" y1="-3.35" x2="-0.7" y2="-3.05" width="0" layer="20" curve="90"/>
-<wire x1="-0.7" y1="-3.05" x2="-0.7" y2="-2.35" width="0" layer="20"/>
-<wire x1="6.3" y1="-2.35" x2="6" y2="-2.05" width="0" layer="20" curve="90"/>
-<wire x1="6" y1="-2.05" x2="5.7" y2="-2.35" width="0" layer="20" curve="90"/>
-<wire x1="5.7" y1="-2.35" x2="5.7" y2="-3.05" width="0" layer="20"/>
-<wire x1="5.7" y1="-3.05" x2="6" y2="-3.35" width="0" layer="20" curve="90"/>
-<wire x1="6" y1="-3.35" x2="6.3" y2="-3.05" width="0" layer="20" curve="90"/>
-<wire x1="6.3" y1="-3.05" x2="6.3" y2="-2.35" width="0" layer="20"/>
 <pad name="P$1" x="0" y="0" drill="0.85" diameter="1.45"/>
 <pad name="P$2" x="5" y="0" drill="0.85" diameter="1.45"/>
 <smd name="3" x="2.5" y="0" dx="1.35" dy="0.4" layer="1" rot="R90"/>
@@ -657,6 +645,8 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <rectangle x1="4.7" y1="-3.75" x2="6.7" y2="-1.65" layer="29"/>
 <smd name="P$5" x="-0.7" y="-2.7" dx="1.8" dy="1.9" layer="1"/>
 <smd name="P$6" x="5.7" y="-2.7" dx="1.8" dy="1.9" layer="1"/>
+<rectangle x1="-1.3" y1="-3.35" x2="-0.7" y2="-2.05" layer="20"/>
+<rectangle x1="5.7" y1="-3.35" x2="6.3" y2="-2.05" layer="20"/>
 </package>
 </packages>
 <symbols>
@@ -2453,11 +2443,11 @@ chip</description>
 <pad name="SW2" x="4.699" y="0" drill="1.8542"/>
 <pad name="SW1" x="-4.699" y="0" drill="1.8542"/>
 <wire x1="-6.604" y1="10.668" x2="6.35" y2="10.668" width="0.127" layer="51"/>
-<wire x1="-2.54" y1="10.668" x2="-2.54" y2="14.478" width="0.127" layer="21"/>
-<wire x1="-2.54" y1="14.478" x2="-1.27" y2="15.6464" width="0.127" layer="21" curve="-90"/>
-<wire x1="-1.27" y1="15.6464" x2="0" y2="15.6464" width="0.127" layer="21"/>
-<wire x1="0" y1="15.6464" x2="1.27" y2="14.478" width="0.127" layer="21" curve="-90"/>
-<wire x1="1.27" y1="14.478" x2="1.27" y2="10.668" width="0.127" layer="21"/>
+<wire x1="-2.54" y1="10.668" x2="-2.54" y2="14.478" width="0.127" layer="51"/>
+<wire x1="-2.54" y1="14.478" x2="-1.27" y2="15.6464" width="0.127" layer="51" curve="-90"/>
+<wire x1="-1.27" y1="15.6464" x2="0" y2="15.6464" width="0.127" layer="51"/>
+<wire x1="0" y1="15.6464" x2="1.27" y2="14.478" width="0.127" layer="51" curve="-90"/>
+<wire x1="1.27" y1="14.478" x2="1.27" y2="10.668" width="0.127" layer="51"/>
 <hole x="-6.604" y="9.525" drill="1.8542"/>
 <hole x="6.604" y="9.525" drill="1.8542"/>
 <text x="-3.81" y="7.62" size="1.27" layer="25">&gt;NAME</text>
