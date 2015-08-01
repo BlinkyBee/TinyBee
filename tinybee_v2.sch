@@ -3987,9 +3987,9 @@ Source: http://www.osram.convergy.de/</description>
 <instance part="FRAME1" gate="V" x="147.32" y="0"/>
 <instance part="GND1" gate="1" x="101.6" y="86.36"/>
 <instance part="GND2" gate="1" x="93.98" y="86.36"/>
-<instance part="GND3" gate="1" x="10.16" y="86.36"/>
+<instance part="GND3" gate="1" x="5.08" y="114.3"/>
 <instance part="SUPPLY1" gate="G$1" x="139.7" y="76.2"/>
-<instance part="SUPPLY2" gate="G$1" x="10.16" y="109.22"/>
+<instance part="SUPPLY2" gate="G$1" x="5.08" y="144.78"/>
 <instance part="SUPPLY3" gate="G$1" x="101.6" y="137.16"/>
 <instance part="JP1" gate="G$1" x="152.4" y="71.12" rot="R180"/>
 <instance part="GND4" gate="1" x="139.7" y="63.5"/>
@@ -4017,7 +4017,7 @@ Source: http://www.osram.convergy.de/</description>
 <instance part="ENC1" gate="G$1" x="180.34" y="109.22"/>
 <instance part="GND9" gate="1" x="193.04" y="96.52"/>
 <instance part="S1" gate="G$1" x="119.38" y="109.22"/>
-<instance part="C1" gate="G$1" x="10.16" y="101.6" rot="R180"/>
+<instance part="C1" gate="G$1" x="5.08" y="134.62" rot="R180"/>
 <instance part="U$2" gate="G$1" x="139.7" y="116.84" rot="R180"/>
 <instance part="IC1" gate="1" x="20.32" y="147.32"/>
 <instance part="Q1" gate="G$1" x="50.8" y="43.18"/>
@@ -4071,10 +4071,10 @@ Source: http://www.osram.convergy.de/</description>
 </segment>
 <segment>
 <pinref part="SUPPLY2" gate="G$1" pin="VCC"/>
-<wire x1="10.16" y1="104.14" x2="10.16" y2="106.68" width="0.1524" layer="91"/>
-<wire x1="10.16" y1="106.68" x2="10.16" y2="109.22" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="106.68" x2="10.16" y2="106.68" width="0.1524" layer="91"/>
-<junction x="10.16" y="106.68"/>
+<wire x1="5.08" y1="137.16" x2="5.08" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="5.08" y1="139.7" x2="5.08" y2="144.78" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="139.7" x2="5.08" y2="139.7" width="0.1524" layer="91"/>
+<junction x="5.08" y="139.7"/>
 <pinref part="C1" gate="G$1" pin="P$2"/>
 </segment>
 <segment>
@@ -4105,12 +4105,14 @@ Source: http://www.osram.convergy.de/</description>
 <pinref part="U$2" gate="G$1" pin="GND"/>
 </segment>
 <segment>
-<wire x1="17.78" y1="93.98" x2="10.16" y2="93.98" width="0.1524" layer="91"/>
 <pinref part="GND3" gate="1" pin="GND"/>
-<wire x1="10.16" y1="93.98" x2="10.16" y2="88.9" width="0.1524" layer="91"/>
-<wire x1="10.16" y1="96.52" x2="10.16" y2="93.98" width="0.1524" layer="91"/>
-<junction x="10.16" y="93.98"/>
+<wire x1="5.08" y1="129.54" x2="5.08" y2="127" width="0.1524" layer="91"/>
 <pinref part="C1" gate="G$1" pin="P$1"/>
+<pinref part="IC1" gate="1" pin="GND"/>
+<wire x1="5.08" y1="127" x2="5.08" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="134.62" x2="12.7" y2="127" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="127" x2="5.08" y2="127" width="0.1524" layer="91"/>
+<junction x="5.08" y="127"/>
 </segment>
 <segment>
 <pinref part="GND5" gate="1" pin="GND"/>
