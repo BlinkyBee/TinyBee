@@ -1,6 +1,7 @@
 #define NO_CORRECTION 1
 #define FASTLED_DOUBLE_OUTPUT 1
 #include <FastLED.h>
+#include <EEPROM.h>
 
 #define NUM_LEDS 64
 #define DATA_PIN 6
@@ -120,11 +121,25 @@ uint32_t g_now = 0;
 
 void next_pattern()
 {
-    // add one to the current pattern number, and wrap around at the end
     g_current_pattern = (g_current_pattern + 1) % ARRAY_SIZE( patterns);
     g_last_cycle_time = g_now;
+    write_state();
+    FastLED.clear();
 }
 
+void enable_autocycle() {
+    g_autocycle = true;
+    g_fading = true;
+    g_fadeStartTime = g_now;
+    next_pattern();  
+}
+
+void disable_autocycle() {
+    g_fading = true;
+    g_fadeStartTime = g_now;
+    g_autocycle = false; 
+    write_state();
+}
 
 //--------------------------------------------------------------------------------------------------
 // setup & loop
@@ -135,6 +150,8 @@ void setup() {
      
     FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
     pinMode(DATA_PIN, OUTPUT);
+
+    read_state();
 }
 
 void loop() {
@@ -145,15 +162,12 @@ void loop() {
     read_switch();
     if (g_longPressThisFrame) {
         if (!g_autocycle) {
-            g_autocycle = true;
-            g_fading = true;
-            g_fadeStartTime = g_now;
-            next_pattern();
+            enable_autocycle();
         }
     }
-    if (g_releasedThisFrame) {
+    if (g_releasedThisFrame && !g_longPress) {
         if (g_autocycle) {
-            g_autocycle = false;
+            disable_autocycle();
         } else {
             next_pattern();
         }
@@ -217,7 +231,6 @@ ISR(PCINT0_vect) {
 }
 
 void read_switch() {
-    //uint32_t now = millis();
     g_releasedThisFrame = false;
     g_pressedThisFrame = false;
     g_longPressThisFrame = false;
@@ -232,7 +245,7 @@ void read_switch() {
       // press
       } else {
         // simple debounce
-        //g_longPress = false;
+        g_longPress = false;
         if (g_now - g_releaseTime > 50) {
           g_pressTime = g_now;
           g_pressed = true;
@@ -244,4 +257,26 @@ void read_switch() {
        g_longPress = true;
        g_longPressThisFrame = true;
     }
-  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// EEPROM
+//--------------------------------------------------------------------------------------------------
+
+void read_state() {
+    uint8_t buffer = 0;
+    EEPROM.get(0, buffer);
+    g_autocycle = buffer == 255 || buffer;
+    EEPROM.get(1, buffer);
+    if (buffer == 255) {
+      g_current_pattern = 0;
+    } else {
+      g_current_pattern = buffer % ARRAY_SIZE( patterns);
+    }
+}
+
+void write_state() {
+    EEPROM.update(0, g_autocycle);
+    EEPROM.update(1, g_current_pattern);
+}
+  
