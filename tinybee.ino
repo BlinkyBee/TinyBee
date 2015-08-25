@@ -1,10 +1,14 @@
 #define NO_CORRECTION 1
-//#define FASTLED_DOUBLE_OUTPUT 1
+#define FASTLED_DOUBLE_OUTPUT 1
 #include <FastLED.h>
 
 #define NUM_LEDS 64
 #define DATA_PIN 6
 #define SWITCH_PIN 7
+
+#define FADE_TIME 150
+#define AUTO_CYCLE_TIME 2000
+#define LONG_PRESS_TIME 1200
 
 //--------------------------------------------------------------------------------------------------
 // globals
@@ -14,6 +18,8 @@
 bool g_pressed = false;
 bool g_pressedThisFrame = false;
 bool g_releasedThisFrame = false;
+bool g_longPress = false;
+bool g_longPressThisFrame = false;
 uint32_t g_pressTime = 0;
 uint32_t g_releaseTime = 0;
 
@@ -22,6 +28,7 @@ volatile int16_t g_rotenc = 200;
 
 CRGB leds[NUM_LEDS];
 
+uint8_t g_fasthue = 0;
 uint8_t g_hue = 0;
 
 //--------------------------------------------------------------------------------------------------
@@ -30,7 +37,7 @@ uint8_t g_hue = 0;
 
 void rainbow() {
     // FastLED's built-in rainbow generator
-    fill_rainbow( leds, NUM_LEDS, g_hue, 7);
+    fill_rainbow( leds, NUM_LEDS, g_fasthue, 7);
 }
 
 
@@ -48,7 +55,10 @@ void sinelon() {
     // a colored dot sweeping back and forth, with fading trails
     fadeToBlackBy( leds, NUM_LEDS, 20);
     int pos = beatsin16(11,0,NUM_LEDS);
-    leds[pos] += CHSV( g_hue, 255, 192);
+    leds[pos] |= CHSV( g_hue, 255, 255);
+    pos = beatsin16(13,0,NUM_LEDS);
+    leds[pos] |= CHSV( g_hue + 128, 255, 255);
+
 } 
 
 const TProgmemPalette16 myPalette_p PROGMEM =
@@ -99,6 +109,12 @@ SimplePatternList patterns = {
 
 uint8_t g_current_pattern = 0;
 bool g_autocycle = true;
+uint32_t g_last_cycle_time = 0;
+
+bool g_fading = false;
+uint32_t g_fadeStartTime = 0;
+
+uint32_t g_now = 0;
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -106,6 +122,7 @@ void next_pattern()
 {
     // add one to the current pattern number, and wrap around at the end
     g_current_pattern = (g_current_pattern + 1) % ARRAY_SIZE( patterns);
+    g_last_cycle_time = g_now;
 }
 
 
@@ -121,18 +138,45 @@ void setup() {
 }
 
 void loop() {
+    g_now = millis();
+
     FastLED.setBrightness(g_rotenc);
     
-    read_switch();  
+    read_switch();
+    if (g_longPressThisFrame) {
+        if (!g_autocycle) {
+            g_autocycle = true;
+            g_fading = true;
+            g_fadeStartTime = g_now;
+            next_pattern();
+        }
+    }
     if (g_releasedThisFrame) {
-        next_pattern();
+        if (g_autocycle) {
+            g_autocycle = false;
+        } else {
+            next_pattern();
+        }
+    }
+
+    if (g_autocycle && g_now - g_last_cycle_time > AUTO_CYCLE_TIME) {
+      next_pattern();
+    }
+
+    if (g_fading) {
+      uint32_t delta = g_now - g_fadeStartTime;
+      if (delta < FADE_TIME) {
+        FastLED.setBrightness(map(delta, 0, FADE_TIME, 0, g_rotenc));
+      } else {
+        g_fading = false;
+      }
     }
 
     (patterns)[g_current_pattern]();
     FastLED.show();
     FastLED.delay(1000/120); 
 
-    EVERY_N_MILLISECONDS( 20 ) { g_hue++; }
+    EVERY_N_MILLISECONDS( 20 ) { g_hue++; g_fasthue+=3; }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -173,25 +217,31 @@ ISR(PCINT0_vect) {
 }
 
 void read_switch() {
+    //uint32_t now = millis();
     g_releasedThisFrame = false;
     g_pressedThisFrame = false;
-    uint32_t now = millis();
+    g_longPressThisFrame = false;
     
     bool currentPressed = digitalRead(SWITCH_PIN) == LOW;
     if (currentPressed != g_pressed) {
       // release
       if (g_pressed) {
-        g_releaseTime = now;
+        g_releaseTime = g_now;
         g_pressed = false;
         g_releasedThisFrame = true;
       // press
       } else {
         // simple debounce
-        if (now - g_releaseTime > 50) {
-          g_pressTime = now;
+        //g_longPress = false;
+        if (g_now - g_releaseTime > 50) {
+          g_pressTime = g_now;
           g_pressed = true;
           g_pressedThisFrame = true;
         }
       }
+    }
+    else if (g_pressed && g_now - g_pressTime > LONG_PRESS_TIME) {
+       g_longPress = true;
+       g_longPressThisFrame = true;
     }
   }
