@@ -1,19 +1,152 @@
+//#define TINYBEE
+#define MODE_YALDA 1
+
+// fixes for tinybee
+#ifdef TINYBEE
 #define NO_CORRECTION 1
 #define FASTLED_DOUBLE_OUTPUT 1
+#endif 
+
 #include <FastLED.h>
 #include <EEPROM.h>
 
+#ifdef TINYBEE
 #define NUM_LEDS 64
 #define DATA_PIN 6
 #define SWITCH_PIN 7
+#else
+#define NUM_LEDS 150
+#define DATA_PIN 9
+#define SWITCH_PIN 2
+#endif
 
+#define PATTERN_CYCLE_TIME 12000
+#define PALETTE_CYCLE_TIME 2500
 #define FADE_TIME 150
-#define AUTO_CYCLE_TIME 2000
-#define LONG_PRESS_TIME 1200
+#define LONG_PRESS_TIME 1000
+
+//--------------------------------------------------------------------------------------------------
+// palettes
+//--------------------------------------------------------------------------------------------------
+
+DEFINE_GRADIENT_PALETTE( Mode_Yalda_gp ) {
+   0,   0,  0, 0,
+   40, 0x3B, 0, 0x72,
+   80,   0,  0, 0,
+  120,  0x19, 0x29, 0x70,
+   160,   0,  0, 0,
+  200,  0, 0x8B, 0x7B,
+  255, 0, 0, 0
+  };
+
+
+DEFINE_GRADIENT_PALETTE( Green_Purple_gp ) {
+  0, 0, 0, 0,
+  32, 0, 127, 0,
+  64, 0, 0, 0,
+  96, 127, 0, 127,
+  128, 0, 0, 0,
+  160, 0, 127, 0,
+  192, 0, 0, 0,
+  224, 127, 0, 127,
+  255, 0, 0, 0,
+};
+
+DEFINE_GRADIENT_PALETTE( Orange_Blue_gp ) {
+  0, 0, 0, 0,
+  32, 0, 0, 128,
+  64, 0, 0, 0,
+  96, 128, 128, 0,
+  128, 0, 0, 0,
+  160, 0, 0, 128,
+  192, 0, 0, 0,
+  224, 128, 128, 0,
+  255, 0, 0, 0,
+};
+
+
+DEFINE_GRADIENT_PALETTE( Rainbow1_gp ) {
+  0, 0, 0, 0,
+  32,  255,  0,  0, // Red
+  64, 0, 0, 0,
+  96,  171, 85,  0, // Orange
+  128, 0, 0, 0,
+  160,  171,171,  0, // Yellow
+  192, 0, 0, 0,
+  224,  171, 85,  0, // Orange
+  255, 0, 0, 0,
+};
+
+
+DEFINE_GRADIENT_PALETTE( Rainbow2_gp ) {
+  0, 0, 0, 0,
+  32, 0,  0xCE1, 0xD1, // Turquoise
+  64, 0, 0, 0,
+  96,    0,255,  0, // Green
+  128, 0, 0, 0,
+  160,    0,171, 85, // Aqua
+  192, 0, 0, 0,
+  224,    0,255,  0, // Green
+  255, 0, 0, 0,
+};
+
+
+DEFINE_GRADIENT_PALETTE( Rainbow3_gp ) {
+  0, 0, 0, 0,
+  32,    0,171, 85, // Aqua
+  64, 0, 0, 0,
+  96,    0,  0,255, // Blue
+  128, 0, 0, 0,
+  160,   85,  0,171, // Purple
+  192, 0, 0, 0,
+  224,    0,  0,255, // Blue
+  255, 0, 0, 0,
+};
+
+
+DEFINE_GRADIENT_PALETTE( Rainbow4_gp ) {
+  0, 0, 0, 0,
+  32,   85,  0,171, // Purple
+  64, 0, 0, 0,
+  96,  171,  0, 85, // Pink
+  128, 0, 0, 0,
+  160,  255,  0,  0, // Red
+  192, 0, 0, 0,
+  224,  171,  0, 85, // Pink
+  255, 0, 0, 0,
+};
+
+
+DEFINE_GRADIENT_PALETTE( My_Rainbow_gp ) {
+      0,  255,  0,  0, // Red
+     32,  171,171,  0, // Yellow
+     64,  0, 0, 0,
+     96,    0,255,  0, // Green
+    128,    0,171, 85, // Aqua
+    160,    0,  0,255, // Blue
+     192,  0, 0, 0,    
+    224,   85,  0,171, // Purple
+    255,  255,  0,  0 // and back to Red
+};
+
+const TProgmemRGBGradientPalettePtr g_palettes[] = {
+    Green_Purple_gp,
+    Orange_Blue_gp,
+    Rainbow1_gp,
+    Rainbow2_gp,
+    Rainbow3_gp,
+    Rainbow4_gp,
+ };
+
+const uint8_t g_palette_count = 
+  sizeof( g_palettes) / sizeof( TProgmemRGBGradientPalettePtr );
 
 //--------------------------------------------------------------------------------------------------
 // globals
 //--------------------------------------------------------------------------------------------------
+
+// LED buffer
+CRGB leds[NUM_LEDS];
 
 // rotary encoder state. TODO: Make this a class
 bool g_pressed = false;
@@ -21,24 +154,35 @@ bool g_pressedThisFrame = false;
 bool g_releasedThisFrame = false;
 bool g_longPress = false;
 bool g_longPressThisFrame = false;
-uint32_t g_pressTime = 0;
-uint32_t g_releaseTime = 0;
-
+uint16_t g_pressTime = 0;
+uint16_t g_releaseTime = 0;
 // volatile because it'll be updated from ISR
 volatile int16_t g_rotenc = 200;
 
-CRGB leds[NUM_LEDS];
-
-uint8_t g_fasthue = 0;
+// patterns global state
 uint8_t g_hue = 0;
+uint8_t g_current_palette_number = 0;
+CRGBPalette16 g_current_palette( CRGB::Black);
+// HACK no memory for another palette so reuse the LED buffer
+CRGBPalette16 *g_target_palette = (CRGBPalette16 *)&leds;
+uint8_t g_palette_offset = 0;
+
+// current timestamp
+uint16_t g_now = 0;
 
 //--------------------------------------------------------------------------------------------------
 // patterns
 //--------------------------------------------------------------------------------------------------
 
 void rainbow() {
-    // FastLED's built-in rainbow generator
-    fill_rainbow( leds, NUM_LEDS, g_fasthue, 7);
+    g_palette_offset++;
+    g_current_palette = My_Rainbow_gp;
+    FillLEDsFromPaletteColors(g_current_palette, g_palette_offset, 5);
+}
+
+void fullrainbow() {
+    fill_rainbow( leds, NUM_LEDS, g_hue * 2, 7);
+    
 }
 
 
@@ -62,39 +206,25 @@ void sinelon() {
 
 } 
 
-const TProgmemPalette16 myPalette_p PROGMEM =
-{
-    CRGB::Blue,
-    CRGB::Indigo,
-    CRGB::Blue,
-    CRGB::Black,
-    CRGB::Black,
-    
-    CRGB::Pink,
-    CRGB::Aqua,
-    CRGB::Purple,
-    CRGB::Aqua,
-    CRGB::Black,
-    CRGB::Black,    
-    
-    CRGB::Orange,
-    CRGB::Purple,
-    CRGB::Orange,
-    CRGB::Black,
-    CRGB::Black
-};
-
 void moving_palette() {
-    static uint8_t start = 0;
-    start++;
-    FillLEDsFromPaletteColors(myPalette_p, start);
+    g_palette_offset++;
+    *g_target_palette = g_palettes[g_current_palette_number];
+    nblendPaletteTowardPalette( g_current_palette, *g_target_palette, 24);
+    FillLEDsFromPaletteColors(g_current_palette, g_palette_offset, 7);
 }
+
+void mode_yalda() {
+    g_palette_offset++;
+    g_current_palette = Mode_Yalda_gp;
+    FillLEDsFromPaletteColors(g_current_palette, g_palette_offset, 9);
+}
+
 
 //--------------------------------------------------------------------------------------------------
 
-void FillLEDsFromPaletteColors(CRGBPalette16 palette, uint8_t colorIndex)
+void FillLEDsFromPaletteColors(CRGBPalette16 &palette, uint8_t colorIndex, uint8_t step)
 {    
-    for( int i = 0; i < NUM_LEDS; i++, colorIndex+=3) {
+    for( int i = 0; i < NUM_LEDS; i++, colorIndex+=step) {
         leds[i] = ColorFromPalette( palette, colorIndex, 255, LINEARBLEND);
     }
 }
@@ -106,16 +236,18 @@ SimplePatternList patterns = {
     rainbow, 
     sinelon,
     moving_palette,
+#if MODE_YALDA
+    mode_yalda,
+#endif
+
  };
 
 uint8_t g_current_pattern = 0;
 bool g_autocycle = true;
-uint32_t g_last_cycle_time = 0;
+uint16_t g_fadeStartTime = 0;
+uint16_t g_last_cycle_time = 0;
+uint16_t g_last_palette_time = 0;
 
-bool g_fading = false;
-uint32_t g_fadeStartTime = 0;
-
-uint32_t g_now = 0;
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -129,13 +261,11 @@ void next_pattern()
 
 void enable_autocycle() {
     g_autocycle = true;
-    g_fading = true;
     g_fadeStartTime = g_now;
     next_pattern();  
 }
 
 void disable_autocycle() {
-    g_fading = true;
     g_fadeStartTime = g_now;
     g_autocycle = false; 
     write_state();
@@ -146,8 +276,12 @@ void disable_autocycle() {
 //--------------------------------------------------------------------------------------------------
 
 void setup() {
+#ifdef TINYBEE
     init_rotenc_pins();
-     
+#endif
+    
+    pinMode(SWITCH_PIN, INPUT_PULLUP); // Switch
+ 
     FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
     pinMode(DATA_PIN, OUTPUT);
 
@@ -173,35 +307,36 @@ void loop() {
         }
     }
 
-    if (g_autocycle && g_now - g_last_cycle_time > AUTO_CYCLE_TIME) {
+    if (g_autocycle && g_now - g_last_cycle_time > PATTERN_CYCLE_TIME) {
       next_pattern();
     }
 
-    if (g_fading) {
-      uint32_t delta = g_now - g_fadeStartTime;
-      if (delta < FADE_TIME) {
+    if (g_now - g_last_palette_time > PALETTE_CYCLE_TIME) {
+      g_current_palette_number = addmod8( g_current_palette_number, 1, g_palette_count);
+      g_last_palette_time = g_now;
+    }
+
+    uint16_t delta = g_now - g_fadeStartTime;
+    if (delta < FADE_TIME) {
         FastLED.setBrightness(map(delta, 0, FADE_TIME, 0, g_rotenc));
-      } else {
-        g_fading = false;
-      }
     }
 
     (patterns)[g_current_pattern]();
     FastLED.show();
     FastLED.delay(1000/120); 
 
-    EVERY_N_MILLISECONDS( 20 ) { g_hue++; g_fasthue+=3; }
+    g_hue++;
 }
 
 //--------------------------------------------------------------------------------------------------
 // Rotary encoder stuff
 //--------------------------------------------------------------------------------------------------
 
+#ifdef TINYBEE
 void init_rotenc_pins(){
   // set pins to input
   pinMode(12, INPUT); // A - PA6
   pinMode(13, INPUT); // B - PA7
-  pinMode(SWITCH_PIN, INPUT_PULLUP); // Switch
   
   // setup pin change interrupt
   cli();  
@@ -229,6 +364,8 @@ ISR(PCINT0_vect) {
     g_rotenc = 255;
   }
 }
+
+#endif
 
 void read_switch() {
     g_releasedThisFrame = false;
@@ -279,4 +416,4 @@ void write_state() {
     EEPROM.update(0, g_autocycle);
     EEPROM.update(1, g_current_pattern);
 }
-  
+
